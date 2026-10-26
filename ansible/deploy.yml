@@ -1,0 +1,14 @@
+---
+- name: Deploy cross-platform status agents
+  hosts: all
+  become: false
+  vars_files:
+    - group_vars/vault.yml
+  tasks:
+    - name: Dispatch to Linux role
+      ansible.builtin.include_tasks: linux.yml
+      when: ansible_system == "Linux"
+
+    - name: Dispatch to Windows role
+      ansible.builtin.include_tasks: windows.yml
+      when: ansible_os_family is defined and ansible_os_family == "Windows"

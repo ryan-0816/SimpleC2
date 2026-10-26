@@ -1,0 +1,12 @@
+$ErrorActionPreference = 'Stop'
+$env:C2_TOKEN = '{{ c2_token }}'
+$server = '{{ c2_server_url }}'
+$ca = '{{ agent_install_dir_windows }}\controller-ca.pem'
+$agent = '{{ agent_install_dir_windows }}\agent.py'
+$interval = '{{ c2_agent_interval }}'
+
+# Use the Python launcher installed on the target. Do not bypass TLS verification.
+while ($true) {
+    & py -3 $agent --server $server --token $env:C2_TOKEN --ca $ca --interval $interval
+    Start-Sleep -Seconds 10
+}

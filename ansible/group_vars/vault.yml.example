@@ -1,0 +1,3 @@
+# Copy to ansible/group_vars/vault.yml and encrypt with:
+# ansible-vault encrypt ansible/group_vars/vault.yml
+c2_token: "REPLACE_WITH_A_LONG_RANDOM_TOKEN"

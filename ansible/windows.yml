@@ -1,0 +1,48 @@
+---
+- name: Check for Python launcher
+  ansible.windows.win_command: py -3 --version
+  changed_when: false
+
+- name: Create agent directory
+  ansible.windows.win_file:
+    path: "{{ agent_install_dir_windows }}"
+    state: directory
+
+- name: Copy agent script
+  ansible.windows.win_copy:
+    src: ../agent.py
+    dest: "{{ agent_install_dir_windows }}\\agent.py"
+
+- name: Copy controller CA
+  ansible.windows.win_copy:
+    src: "{{ controller_ca_file }}"
+    dest: "{{ agent_install_dir_windows }}\\controller-ca.pem"
+
+- name: Write agent launcher
+  ansible.windows.win_template:
+    src: templates/agent.ps1.j2
+    dest: "{{ agent_install_dir_windows }}\\run-agent.ps1"
+  no_log: true
+
+- name: Create startup scheduled task
+  community.windows.win_scheduled_task:
+    name: SimpleC2StatusAgent
+    description: Authorized lab inventory/status reporting agent
+    actions:
+      - path: powershell.exe
+        arguments: '-NoProfile -NonInteractive -ExecutionPolicy Bypass -File "{{ agent_install_dir_windows }}\\run-agent.ps1"'
+        working_directory: "{{ agent_install_dir_windows }}"
+    triggers:
+      - type: boot
+    username: SYSTEM
+    run_level: highest
+    enabled: true
+    state: present
+
+- name: Start agent now
+  ansible.windows.win_powershell:
+    script: |
+      $task = Get-ScheduledTask -TaskName 'SimpleC2StatusAgent' -ErrorAction Stop
+      if ((Get-ScheduledTaskInfo -TaskName 'SimpleC2StatusAgent').State -ne 'Running') {
+        Start-ScheduledTask -TaskName 'SimpleC2StatusAgent'
+      }

@@ -1,0 +1,9 @@
+# Replace with the controller's reachable HTTPS address and port.
+c2_server_url: "https://192.0.2.10:8443"
+c2_agent_interval: 15
+
+# PEM certificate/CA file copied to targets. For a self-signed lab certificate,
+# this can be server.crt; for a CA-issued certificate, use the CA certificate.
+controller_ca_file: "../certs/server.crt"
+agent_install_dir_linux: "/opt/simple-c2"
+agent_install_dir_windows: 'C:\ProgramData\SimpleC2'
